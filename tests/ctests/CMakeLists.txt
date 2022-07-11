@@ -15,6 +15,9 @@ endif()
 
 # setup test executable
 add_executable(runAleTests ${ALE_TEST_SOURCE})
+target_include_directories(runAleTests
+                           PRIVATE
+                           ${CSPICE_INCLUDE_DIR})
 target_link_libraries(runAleTests
                       PRIVATE
                       ale
@@ -23,6 +26,7 @@ target_link_libraries(runAleTests
                       gmock
                       Threads::Threads
                       nlohmann_json::nlohmann_json
+                      ${CSPICE_LIBRARY}
                       )
 
 gtest_discover_tests(runAleTests WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/tests/ctests)

@@ -1,10 +1,13 @@
 name: ale
 channels:
+  - mechsoft
+  - local
   - conda-forge
   - default
 
 dependencies:
   - cmake>=3.15
+  - cspice ==66
   - pytest
   - eigen
   - jupyter

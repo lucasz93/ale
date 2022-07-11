@@ -59,7 +59,7 @@ namespace ale {
     return "";
  }
 
- std::string loads(std::string filename, std::string props, std::string formatter, bool verbose) {
+ std::string loads(void *naif_context, std::string filename, std::string props, std::string formatter, bool verbose) {
      static bool first_run = true;
      if(first_run) {
          // Initialize the Python interpreter but only once.
@@ -93,16 +93,20 @@ namespace ale {
      }
       
      // Set the Python int as the first and second arguments to the method.
+     PyObject *pNaifContext = PyLong_FromVoidPtr(naif_context);
+     PyTuple_SetItem(pArgs, 0, pNaifContext);
+     Py_INCREF(pNaifContext); // take ownership of reference
+
      PyObject *pStringFileName = PyUnicode_FromString(filename.c_str());
-     PyTuple_SetItem(pArgs, 0, pStringFileName);
+     PyTuple_SetItem(pArgs, 1, pStringFileName);
      Py_INCREF(pStringFileName); // take ownership of reference
 
      PyObject *pStringProps = PyUnicode_FromString(props.c_str());
-     PyTuple_SetItem(pArgs, 1, pStringProps);
+     PyTuple_SetItem(pArgs, 2, pStringProps);
      Py_INCREF(pStringProps); // take ownership of reference
      
      PyObject *pStringFormatter = PyUnicode_FromString(formatter.c_str());
-     PyTuple_SetItem(pArgs, 2, pStringFormatter);
+     PyTuple_SetItem(pArgs, 3, pStringFormatter);
      Py_INCREF(pStringFormatter); // take ownership of reference 
     
 
@@ -126,6 +130,7 @@ namespace ale {
 
      Py_DECREF(pResultStr);
 
+     Py_DECREF(pNaifContext);
      Py_DECREF(pStringFileName);
      Py_DECREF(pStringProps);
      Py_DECREF(pStringFormatter);
@@ -135,8 +140,8 @@ namespace ale {
      return cResult;
  }
 
- json load(std::string filename, std::string props, std::string formatter, bool verbose) {
-   std::string jsonstr = loads(filename, props, formatter, verbose);
+ json load(void *naif_context, std::string filename, std::string props, std::string formatter, bool verbose) {
+   std::string jsonstr = loads(naif_context, filename, props, formatter, verbose);
    return json::parse(jsonstr);
  }
 }

@@ -9,6 +9,8 @@
 cmake_minimum_required(VERSION 3.15)
 project(ale VERSION 0.8.6 DESCRIPTION "Abstraction Library for Ephemerides ")
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
 # include what we need
 include(GNUInstallDirs)
 
@@ -17,6 +19,8 @@ set(CMAKE_CXX_STANDARD 11)
 option(ALE_BUILD_LOAD "If the C++ Python load interface should be built." ON)
 option(ALE_USE_EXTERNAL_JSON "If an external nlohmann JSON library should be used" ON)
 option(ALE_USE_EXTERNAL_EIGEN "If an external EIGEN library should be used" ON)
+
+find_package(CSPICE REQUIRED)
 
 # Third Party Dependencies
 if(ALE_USE_EXTERNAL_JSON)
@@ -84,9 +88,10 @@ target_include_directories(ale
                            PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                            $<INSTALL_INTERFACE:include>
-                           PRIVATE)
+                           PRIVATE
+                           ${CSPICE_INCLUDE_DIR})
 
-target_link_libraries(ale PRIVATE ${ALE_PRIVATE_LINKS}
+target_link_libraries(ale PRIVATE ${ALE_PRIVATE_LINKS} ${CSPICE_LIBRARY}
                           PUBLIC ${ALE_PUBLIC_LINKS})
 
 # Optional build tests
