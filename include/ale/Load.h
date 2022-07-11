@@ -12,6 +12,7 @@ namespace ale {
    * of the metadata for an image into an ISD string. See the Python
    * loads method for how this is implemented on the Python side.
    *
+   * @param naif_context Pointer to the NAIF context (returned by cspice_init()).
    * @param filename The filename of the image to load metadata for
    * @param props A JSON formatted properties string to pass to the Python drivers.
    *              Users can specify certain properties that the drivers will use.
@@ -26,13 +27,14 @@ namespace ale {
    *
    * @returns A string containing a JSON formatted ISD for the image.
    */
-  std::string loads(std::string filename, std::string props="", std::string formatter="usgscsm", bool verbose=true);
+  std::string loads(void *naif_context, std::string filename, std::string props="", std::string formatter="usgscsm", bool verbose=true);
 
   /**
    * Load all of the metadata for an image into a JSON ISD.
    * This method is a convenience wrapper around the loads method that parses the
    * string output of loads into a JSON object.
    *
+   * @param naif_context Pointer to the NAIF context (returned by cspice_init()).
    * @param filename The filename of the image to load metadata for
    * @param props A JSON formatted properties string to pass to the Python drivers.
    *              Users can specify certain properties that the drivers will use.
@@ -47,7 +49,7 @@ namespace ale {
    *
    * @returns A string containing a JSON formatted ISD for the image.
    */
-  nlohmann::json load(std::string filename, std::string props="", std::string formatter="usgscsm", bool verbose=true);
+  nlohmann::json load(void *naif_context, std::string filename, std::string props="", std::string formatter="usgscsm", bool verbose=true);
 }
 
 #endif // ALE_H

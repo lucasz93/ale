@@ -13,6 +13,8 @@ import datetime
 from datetime import datetime, date
 import traceback
 from collections import OrderedDict
+import spiceypy as spice
+import ctypes
 
 from ale.formatters.usgscsm_formatter import to_usgscsm
 from ale.formatters.isis_formatter import to_isis
@@ -53,7 +55,7 @@ class AleJsonEncoder(json.JSONEncoder):
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
-def load(label, props={}, formatter='ale', verbose=False):
+def load(naif_context, label, props={}, formatter='ale', verbose=False):
     """
     Attempt to load a given label from all possible drivers.
 
@@ -64,6 +66,9 @@ def load(label, props={}, formatter='ale', verbose=False):
 
     Parameters
     ----------
+    naif_context : long
+                   Pointer to the NAIF context this method should execute in.
+
     label : str
             String path to the given label file
 
@@ -89,6 +94,8 @@ def load(label, props={}, formatter='ale', verbose=False):
     """
     if isinstance(formatter, str):
         formatter = __formatters__[formatter]
+
+    spice.setNaifContext(ctypes.c_void_p(naif_context), False)
 
     drivers = chain.from_iterable(inspect.getmembers(dmod, lambda x: inspect.isclass(x) and "_driver" in x.__module__) for dmod in __driver_modules__)
     drivers = sort_drivers([d[1] for d in drivers])
@@ -127,7 +134,7 @@ def load(label, props={}, formatter='ale', verbose=False):
                 traceback.print_exc()
     raise Exception('No Such Driver for Label')
 
-def loads(label, props='', formatter='ale', verbose=False):
+def loads(naif_context, label, props='', formatter='ale', verbose=False):
     """
     Attempt to load a given label from all possible drivers.
 
@@ -142,7 +149,7 @@ def loads(label, props='', formatter='ale', verbose=False):
     --------
     load
     """
-    res = load(label, props, formatter, verbose=verbose)
+    res = load(naif_context, label, props, formatter, verbose=verbose)
     return json.dumps(res, cls=AleJsonEncoder)
 
 
